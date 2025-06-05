@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 from scipy.fft import fft
 from sklearn.linear_model import LinearRegression
 from sqlalchemy import create_engine
+import seaborn as sns  # 用于可视化相关性矩阵
 
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']  # macOS系统字体
 plt.rcParams['axes.unicode_minus'] = False
@@ -38,18 +39,19 @@ def process_data(df):
     return df
 
 
-def analysis_factor(df):
+def analyze_factor(df):
     df = df[['factor', 'date', 'next_cycle_pct']]
     # print(df)
     # print(df['factor'].unique())
 
-    # analysis_time_series(df)
-    # rolling_window_statistics(df)
-    # analysis_season(df)
-    # analysis(df)
+    analyze_time_series(df)
+    rolling_window_statistics(df)
+    analyze_season(df)
+    analyze_effectiveness(df)
+    analyze_correlation(df)
 
 
-def analysis_time_series(df):
+def analyze_time_series(df):
     # for factor_name in df['factor'].unique():
     for factor_name in effective_factors:
         # 筛选当前因子的数据
@@ -87,7 +89,7 @@ def rolling_window_statistics(df, window_size=12):
         plt.show()
 
 
-def analysis_ranking(df):
+def analyze_ranking(df):
     df['rank'] = df.groupby('date')['strategy_return'].rank(ascending=False)
 
     plt.figure(figsize=(16, 8))
@@ -118,7 +120,7 @@ def analysis_ranking(df):
 
 
 # 季节性分析
-def analysis_season(df):
+def analyze_season(df):
     for factor_name in effective_factors:
         df_factor = df[df['factor'] == factor_name].copy()
 
@@ -139,7 +141,7 @@ def analysis_season(df):
         plt.show()
 
 
-def analysis(df):
+def analyze_effectiveness(df):
     # 按因子分组 -> 创建不同因子的分析数据集
     grouped = df.groupby('factor')
 
@@ -192,8 +194,8 @@ def analysis(df):
     print(results_df.head(10))
 
 
-def analysis_returns(df):
-    analysis_ranking(df[df['return_type'] == '月度'].copy())
+def analyze_returns(df):
+    # analyze_ranking(df[df['return_type'] == '月度'].copy())
 
     df = df[df['return_type'] == '周度'].copy()
     # print(df)
@@ -201,8 +203,8 @@ def analysis_returns(df):
     long_term_factors = []
     short_term_factors = []
 
-    analysis_week_returns(df, '2021-01-01', short_term_factors)
-    analysis_week_returns(df, '2018-01-01', long_term_factors)
+    analyze_week_returns(df, '2021-01-01', short_term_factors)
+    analyze_week_returns(df, '2018-01-01', long_term_factors)
 
     print(f'短期因子: {short_term_factors}')
     print(f'长期因子: {long_term_factors}')
@@ -219,7 +221,23 @@ def analysis_returns(df):
     print(f'有效因子: {effective_factors}')
 
 
-def analysis_week_returns(df, date, factors):
+def analyze_correlation(df):
+    # 筛选出 effective_factors 对应的因子数据
+    df = df[df['factor'].isin(effective_factors)]
+    # 将数据按日期和因子进行透视，以计算相关性
+    pivot_df = df.pivot(index='date', columns='factor', values='next_cycle_pct')
+    # 计算相关性矩阵
+    correlation_matrix = pivot_df.corr()
+    # 打印相关性矩阵
+    print(correlation_matrix)
+    # 可视化相关性矩阵
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
+    plt.title('Effective Factors Correlation Matrix')
+    plt.show()
+
+
+def analyze_week_returns(df, date, factors):
     df = df[df['date'] >= date]
 
     # 按因子分组 -> 创建不同因子的分析数据集
@@ -264,13 +282,13 @@ if __name__ == '__main__':
         df_returns = pd.read_sql(returns_sql, engine)
         df_returns = process_data(df_returns)
         # print(df_returns)
-        analysis_returns(df_returns)
+        analyze_returns(df_returns)
 
         holdings_sql = "SELECT * FROM lude_holdings"
         df_holdings = pd.read_sql(holdings_sql, engine)
         df_holdings = process_data(df_holdings)
         # print(df_holdings)
-        analysis_factor(df_holdings)
+        analyze_factor(df_holdings)
     except Exception as e:
         print(f"数据库连接失败: {e}")
     finally:
