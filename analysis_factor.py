@@ -44,10 +44,10 @@ def analyze_factor(df):
     # print(df)
     # print(df['factor'].unique())
 
-    analyze_time_series(df)
-    rolling_window_statistics(df)
-    analyze_season(df)
-    analyze_effectiveness(df)
+    # analyze_time_series(df)
+    # rolling_window_statistics(df)
+    # analyze_season(df)
+    # analyze_effectiveness(df)
     analyze_correlation(df)
 
 
@@ -97,7 +97,7 @@ def analyze_ranking(df):
     # 绘制每个因子的排名随时间变化曲线
     for factor_name in effective_factors:
         df_factor = df[df['factor'] == factor_name].copy()
-        print(f'{factor_name}在{df_factor['date']}的排名为{df_factor['rank']}')
+        # print(f'{factor_name}在{df_factor['date']}的排名为{df_factor['rank']}')
         plt.plot(df_factor['date'], df_factor['rank'], label=factor_name, alpha=0.7,
                  linewidth=1)
         # plt.figure(figsize=(12, 6))
@@ -224,12 +224,47 @@ def analyze_returns(df):
 def analyze_correlation(df):
     # 筛选出 effective_factors 对应的因子数据
     df = df[df['factor'].isin(effective_factors)]
-    # 将数据按日期和因子进行透视，以计算相关性
+
+    # 将数据按日期和因子进行透视
     pivot_df = df.pivot(index='date', columns='factor', values='next_cycle_pct')
+
     # 计算相关性矩阵
     correlation_matrix = pivot_df.corr()
+
     # 打印相关性矩阵
     print(correlation_matrix)
+
+    # 找出相关性 >0.7 的因子对
+    strong_correlations = []
+
+    # 遍历相关性矩阵的上三角部分（不包括对角线）
+    for i in range(len(correlation_matrix.columns)):
+        for j in range(i + 1, len(correlation_matrix.columns)):
+            factor1 = correlation_matrix.columns[i]
+            factor2 = correlation_matrix.columns[j]
+            correlation = correlation_matrix.iloc[i, j]
+
+            # 筛选出绝对值 >0.7 的强相关因子对
+            if abs(correlation) > 0.7:
+                strong_correlations.append({
+                    'factor1': factor1,
+                    'factor2': factor2,
+                    'correlation': correlation
+                })
+
+    # 将结果转换为DataFrame并排序
+    if strong_correlations:
+        strong_correlations_df = pd.DataFrame(strong_correlations)
+        strong_correlations_df = strong_correlations_df.sort_values(
+            by='correlation',
+            key=abs,
+            ascending=False
+        )
+        print("\n强相关因子对 (|相关性| > 0.7):")
+        print(strong_correlations_df)
+    else:
+        print("\n没有发现相关性 >0.7 的因子对")
+
     # 可视化相关性矩阵
     plt.figure(figsize=(12, 10))
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
