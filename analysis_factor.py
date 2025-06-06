@@ -21,12 +21,84 @@ DB_CONFIG = {
 }
 
 engine = None
+"""
+      factor1     factor2  correlation
+28   前收盘价_负相关     开盘价_负相关     0.998719
+6    5日均价_负相关     最低价_负相关     0.997730
+46    收盘价_负相关     最低价_负相关     0.995175
+5    5日均价_负相关     收盘价_负相关     0.994031
+42    开盘价_负相关     最低价_负相关     0.993355
+31   前收盘价_负相关     最高价_负相关     0.993086
+41    开盘价_负相关     收盘价_负相关     0.992899
+30   前收盘价_负相关     最低价_负相关     0.992817
+4    5日均价_负相关     开盘价_负相关     0.992624
+43    开盘价_负相关     最高价_负相关     0.992519
+2    5日均价_负相关    前收盘价_负相关     0.992431
+29   前收盘价_负相关     收盘价_负相关     0.992199
+47    收盘价_负相关     最高价_负相关     0.988587
+7    5日均价_负相关     最高价_负相关     0.987631
+50    最低价_负相关     最高价_负相关     0.987564
 
-effective_factors = ['转股溢价率_负相关', '修正溢价率_负相关', '5日均价_负相关', '理论偏离度_负相关', '最高价_负相关',
+--------------
+'最低价','5日均价','收盘价','最高价','最低价','开盘价'，5个价格因子高度正相关
+2018年-至今数据：
+5日均价_负相关 的周度累计收益率 1.8744023419739961大于基准累计收益率 1.4289371947604446
+前收盘价_负相关 的周度累计收益率 1.915686194023416大于基准累计收益率 1.4289371947604446
+开盘价_负相关 的周度累计收益率 1.9197217588091011大于基准累计收益率 1.4289371947604446
+收盘价_负相关 的周度累计收益率 1.887609503319224大于基准累计收益率 1.4289371947604446
+最低价_负相关 的周度累计收益率 1.8747179730920431大于基准累计收益率 1.4289371947604446
+最高价_负相关 的周度累计收益率 1.9929449110423987大于基准累计收益率 1.4289371947604446
+
+2021年-至今数据：
+5日均价_负相关 的周度累计收益率 2.250559364591301大于基准累计收益率 2.135348938021254
+前收盘价_负相关 的周度累计收益率 2.267533642091059大于基准累计收益率 2.135348938021254
+开盘价_负相关 的周度累计收益率 2.30084585729328大于基准累计收益率 2.135348938021254
+收盘价_负相关 的周度累计收益率 2.1948127591694924大于基准累计收益率 2.135348938021254
+最低价_负相关 的周度累计收益率 2.2586431742163544大于基准累计收益率 2.135348938021254
+最高价_负相关 的周度累计收益率 2.382400230461033大于基准累计收益率 2.135348938021254
+
+可以看到 最高价_负相关 相对表现更好。
+--------------
+
+49    收盘价_负相关   纯债溢价率_负相关     0.976051
+1    5日均价_负相关   到期收益率_正相关     0.974951
+23  到期收益率_正相关     最低价_负相关     0.973596
+9    5日均价_负相关   纯债溢价率_负相关     0.973533
+52    最低价_负相关   纯债溢价率_负相关     0.973107
+45    开盘价_负相关   纯债溢价率_负相关     0.971269
+33   前收盘价_负相关   纯债溢价率_负相关     0.970013
+22  到期收益率_正相关     收盘价_负相关     0.967643
+54    最高价_负相关   纯债溢价率_负相关     0.965854
+21  到期收益率_正相关     开盘价_负相关     0.965486
+26  到期收益率_正相关   纯债溢价率_负相关     0.964703
+19  到期收益率_正相关    前收盘价_负相关     0.964606
+24  到期收益率_正相关     最高价_负相关     0.959782
+14  修正溢价率_负相关     收盘价_负相关     0.928627
+13  修正溢价率_负相关     开盘价_负相关     0.923954
+15  修正溢价率_负相关     最低价_负相关     0.923485
+0    5日均价_负相关   修正溢价率_负相关     0.923447
+11  修正溢价率_负相关    前收盘价_负相关     0.920979
+16  修正溢价率_负相关     最高价_负相关     0.918466
+18  修正溢价率_负相关   纯债溢价率_负相关     0.915817
+10  修正溢价率_负相关   到期收益率_正相关     0.912065
+
+
+----------
+价格 - 纯债溢价率 - 到期收益率 高度正相关
+正股总市值 - 正股流通市值 高度正相关
+----------
+
+"""
+factors_v1 = ['转股溢价率_负相关', '修正溢价率_负相关', '5日均价_负相关', '理论偏离度_负相关', '最高价_负相关',
+              '最低价_负相关', '正股市销率_正相关', '剩余市值_负相关', '纯债溢价率_负相关', '到期收益率_正相关',
+              '双低_负相关', '开盘价_负相关', '正股市盈率_正相关', '收盘价_负相关', '正股总市值_负相关',
+              '5日超额涨跌幅_负相关', '正股5日涨跌幅_正相关', '正股流通市值_负相关', '上市天数_负相关',
+              '前收盘价_负相关']
+
+effective_factors = ['转股溢价率_负相关', '理论偏离度_负相关', '最高价_负相关',
                      '最低价_负相关', '正股市销率_正相关', '剩余市值_负相关', '纯债溢价率_负相关', '到期收益率_正相关',
-                     '双低_负相关', '开盘价_负相关', '正股市盈率_正相关', '收盘价_负相关', '正股总市值_负相关',
-                     '5日超额涨跌幅_负相关', '正股5日涨跌幅_正相关', '正股流通市值_负相关', '上市天数_负相关',
-                     '前收盘价_负相关']
+                     '双低_负相关', '正股市盈率_正相关', '正股总市值_负相关',
+                     '5日超额涨跌幅_负相关', '正股5日涨跌幅_正相关', '上市天数_负相关']
 
 
 def process_data(df):
@@ -194,7 +266,7 @@ def analyze_effectiveness(df):
     print(results_df.head(10))
 
 
-def analyze_returns(df):
+def analyze_term_returns(df):
     # analyze_ranking(df[df['return_type'] == '月度'].copy())
 
     df = df[df['return_type'] == '周度'].copy()
@@ -203,8 +275,8 @@ def analyze_returns(df):
     long_term_factors = []
     short_term_factors = []
 
-    analyze_week_returns(df, '2021-01-01', short_term_factors)
-    analyze_week_returns(df, '2018-01-01', long_term_factors)
+    short_term_factors = analyze_week_returns(df, '2021-01-01')
+    long_term_factors = analyze_week_returns(df, '2018-01-01')
 
     print(f'短期因子: {short_term_factors}')
     print(f'长期因子: {long_term_factors}')
@@ -213,12 +285,36 @@ def analyze_returns(df):
     intersection = list(set(short_term_factors) & set(long_term_factors))
     short_difference = list(set(short_term_factors) - set(long_term_factors))
     long_difference = list(set(long_term_factors) - set(short_term_factors))
-    print(f'交集: {intersection}')
     print(f'short 差集: {short_difference}')
     print(f'long 差集: {long_difference}')
+    print(f'有效因子: {intersection}')
 
-    effective_factors = intersection
-    print(f'有效因子: {effective_factors}')
+"""
+2018起至今每年超过基准收益的因子: {'修正溢价率_负相关', '理论偏离度_负相关', '双低_负相关'}
+2019起至今每年超过基准收益的因子: {'修正溢价率_负相关', '转股溢价率_负相关', '理论偏离度_负相关', '双低_负相关'}
+2020起至今每年超过基准收益的因子: {'修正溢价率_负相关', '转股溢价率_负相关', '理论偏离度_负相关', '双低_负相关'}
+2021起至今每年超过基准收益的因子: {'转股溢价率_负相关', '最高价_负相关', '收盘价_负相关', '双低_负相关', '前收盘价_负相关', '理论偏离度_负相关', '最低价_负相关', '纯债溢价率_负相关', '修正溢价率_负相关', '开盘价_负相关', '到期收益率_正相关', '5日均价_负相关'}
+2022起至今每年超过基准收益的因子: {'转股溢价率_负相关', '最高价_负相关', '收盘价_负相关', '双低_负相关', '前收盘价_负相关', '理论偏离度_负相关', '最低价_负相关', '纯债溢价率_负相关', '正股总市值_负相关', '修正溢价率_负相关', '开盘价_负相关', '到期收益率_正相关', '5日均价_负相关'}
+"""
+def analyze_annual_returns(df):
+    df = df[df['return_type'] == '周度'].copy()
+    # print(df)
+    target_years = list(range(2018, 2026))
+    yearly_outperforming_factors = {}
+    for year in target_years:
+        start_date = f'{year}-01-01'
+        end_date = f'{year}-12-31'
+        outperforming_factors = analyze_week_returns(df, start_date, end_date)
+        yearly_outperforming_factors[year] = outperforming_factors
+        print(f'{year}年表现良好的因子: {outperforming_factors}')
+
+    # 依次计算所有年份的交集，如2018则取2018-2025的交集，2019则取2019-2025的交集，2020则取2020-2025的交集，2021则取2021-2025的交集
+    for year in target_years:
+        start_year = year
+        end_year = 2025
+        intersection = set.intersection(
+            *[set(yearly_outperforming_factors[year]) for year in range(start_year, end_year + 1)])
+        print(f'{start_year}起至今每年超过基准收益的因子: {intersection}')
 
 
 def analyze_correlation(df):
@@ -270,10 +366,18 @@ def analyze_correlation(df):
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1)
     plt.title('Effective Factors Correlation Matrix')
     plt.show()
+    # 相关性矩阵输出为 csv 文件
+    correlation_matrix.to_csv('correlation_matrix.csv')
 
 
-def analyze_week_returns(df, date, factors):
-    df = df[df['date'] >= date]
+def analyze_week_returns(df, start_date, end_date=None):
+    factors = []
+    df = df[df['date'] >= start_date]
+    if end_date:
+        df = df[df['date'] <= end_date]
+
+    print('-' * 50)
+    print(f'{start_date} 至 {end_date} 周度收益分析')
 
     # 按因子分组 -> 创建不同因子的分析数据集
     grouped = df.groupby('factor')
@@ -290,6 +394,7 @@ def analyze_week_returns(df, date, factors):
 
         print(
             f'{factor} 的周度累计收益率 {group.iloc[-1]['strategy_cum_return']}大于基准累计收益率 {group.iloc[-1]['benchmark_cum_return']}')
+
         factors.append(factor)
         # 绘制累计收益率曲线
         # plt.figure(figsize=(12, 6))
@@ -300,6 +405,8 @@ def analyze_week_returns(df, date, factors):
         # plt.xticks(rotation=45)
         # plt.tight_layout()
         # plt.show()
+    print('-' * 50)
+    return factors
 
 
 if __name__ == '__main__':
@@ -317,8 +424,8 @@ if __name__ == '__main__':
         df_returns = pd.read_sql(returns_sql, engine)
         df_returns = process_data(df_returns)
         # print(df_returns)
-        analyze_returns(df_returns)
-
+        # analyze_term_returns(df_returns)
+        # analyze_annual_returns(df_returns)
         holdings_sql = "SELECT * FROM lude_holdings"
         df_holdings = pd.read_sql(holdings_sql, engine)
         df_holdings = process_data(df_holdings)
