@@ -11,10 +11,10 @@ DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
     'password': '123456',
-    'database': 'quant_voyager'
+    'database': 'lude'
 }
 
-path = './2018.1.2-2025.5.26单因子回测'
+path = './2018.1.2-2025.8.8单因子回测'
 
 
 def proces_single_file(file_path):
@@ -92,13 +92,105 @@ def proces_single_file(file_path):
                 print(f"插入回测结果数据失败: {e}")
 
     # 处理回报相关的 sheet（年度回报、月度回报、周度回报等）
-    return_sheets = [name for name in xls.sheet_names if "回报" in name]
-    for sheet_name in return_sheets:
-        # 读取回报 sheet
-        df_returns = pd.read_excel(xls, sheet_name)
-        return_type = sheet_name.replace("回报", "")  # 提取回报类型，如“年度”
+    # return_sheets = [name for name in xls.sheet_names if "回报" in name]
+    # for sheet_name in return_sheets:
+    #     # 读取回报 sheet
+    #     df_returns = pd.read_excel(xls, sheet_name)
+    #     return_type = sheet_name.replace("回报", "")  # 提取回报类型，如“年度”
+    #     # 遍历每一行数据并插入
+    #     for index, row in df_returns.iterrows():
+    #         sql = """
+    #         INSERT INTO lude_returns (correlation_type, factor, return_type, date, strategy_return, benchmark_return, excess_return)
+    #         VALUES (%s, %s, %s, %s, %s, %s, %s)
+    #         """
+    #         try:
+    #             result = cursor.execute(sql, (
+    #                 correlation_type,
+    #                 factor,
+    #                 return_type,
+    #                 row[return_type],
+    #                 row['策略收益'],
+    #                 row['基准收益'],
+    #                 row['超额收益']
+    #             ))
+    #             db_connection.commit()
+    #             print(
+    #                 f'{correlation_type} - {factor}， 保存 {return_type} {row[return_type]} 回报结果成功，result={result}')
+    #         except Exception as e:
+    #             print(f"插入 {sheet_name} 数据失败: {e}")
+    #     print(f"{sheet_name} 数据插入成功")
+
+    if "年度回报" in xls.sheet_names:
+        return_type = "年度"
+        sheet_name = f"{return_type}回报"
+        # 读取回测结果 sheet
+        df_return = pd.read_excel(xls, sheet_name)
+        # 设置 return_type 列为 int 类型
+        # df_return[return_type] = df_return[return_type].astype(int)
         # 遍历每一行数据并插入
-        for index, row in df_returns.iterrows():
+        for index, row in df_return.iterrows():
+            sql = """
+            INSERT INTO lude_returns (correlation_type, factor, return_type, date, strategy_return, benchmark_return, excess_return)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            # row['年度']是2022这种格式，date 需要设置为当年度最后一天
+            date = f'{int(row[return_type])}-12-31'
+            try:
+                result = cursor.execute(sql, (
+                    correlation_type,
+                    factor,
+                    return_type,
+                    date,
+                    row['策略收益'],
+                    row['基准收益'],
+                    row['超额收益']
+                ))
+                db_connection.commit()
+                print(
+                    f'{correlation_type} - {factor}， 保存 {sheet_name} {row[return_type]} 回报结果成功，result={result}')
+            except Exception as e:
+                print(f"插入 {sheet_name} 数据失败: {e}")
+        print(f"{sheet_name} 数据插入成功")
+
+
+    if "月度回报" in xls.sheet_names:
+        return_type = "月度"
+        sheet_name = f"{return_type}回报"
+        # 读取回测结果 sheet
+        df_return = pd.read_excel(xls, sheet_name)
+        # 遍历每一行数据并插入
+        for index, row in df_return.iterrows():
+            sql = """
+            INSERT INTO lude_returns (correlation_type, factor, return_type, date, strategy_return, benchmark_return, excess_return)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            # row['月度']是2022-08这种格式，date 需要设置为当月度最后一天
+            date = pd.Period(row[return_type]).end_time.strftime('%Y-%m-%d')
+            try:
+                result = cursor.execute(sql, (
+                    correlation_type,
+                    factor,
+                    return_type,
+                    date,
+                    row['策略收益'],
+                    row['基准收益'],
+                    row['超额收益']
+                ))
+                db_connection.commit()
+                print(
+                    f'{correlation_type} - {factor}， 保存 {sheet_name} {row[return_type]} 回报结果成功，result={result}')
+            except Exception as e:
+                print(f"插入 {sheet_name} 数据失败: {e}")
+        print(f"{sheet_name} 数据插入成功")
+
+
+    if "周度回报" in xls.sheet_names:
+        return_type = "周度"
+        sheet_name = f"{return_type}回报"
+        # 读取回测结果 sheet
+        df_return = pd.read_excel(xls, sheet_name)
+        # 遍历每一行数据并插入
+        for index, row in df_return.iterrows():
             sql = """
             INSERT INTO lude_returns (correlation_type, factor, return_type, date, strategy_return, benchmark_return, excess_return)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -115,7 +207,7 @@ def proces_single_file(file_path):
                 ))
                 db_connection.commit()
                 print(
-                    f'{correlation_type} - {factor}， 保存 {return_type} {row[return_type]} 回报结果成功，result={result}')
+                    f'{correlation_type} - {factor}， 保存 {sheet_name} {row[return_type]} 回报结果成功，result={result}')
             except Exception as e:
                 print(f"插入 {sheet_name} 数据失败: {e}")
         print(f"{sheet_name} 数据插入成功")
@@ -126,24 +218,26 @@ def proces_single_file(file_path):
         df_holdings = pd.read_excel(xls, "持仓详情")
         # 遍历每一行数据并插入
         for index, row in df_holdings.iterrows():
+            # 最后一行，跳过
+            if index == len(df_holdings) - 1:
+                break
             sql = """
-            INSERT INTO lude_holdings (correlation_type, factor, date, holding, holding_quantity, buy_quantity, sell_quantity, turnover, next_cycle_pct)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO lude_holdings (correlation_type, factor, date, holding, holding_quantity, turnover, next_cycle_pct, cumulative_nav)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """
             try:
                 result = cursor.execute(sql, (
                     correlation_type,
                     factor,
-                    row['选债日(收盘后)'],
-                    row['持仓标的'],
+                    row['交易日(收盘后)'],
+                    row['持有标的'],
                     row['持有数量'],
-                    row['买入数量'],
-                    row['卖出数量'],
                     row['换手率'],
-                    row['下周期持仓涨跌幅']
+                    row['下周期持仓涨跌幅'],
+                    row['累计净值']
                 ))
                 db_connection.commit()
-                print(f'{correlation_type} - {factor}， 保存持仓明细成功，result={result}')
+                # print(f'{correlation_type} - {factor}， 保存持仓明细成功，result={result}')
             except Exception as e:
                 print(f"插入持仓明细数据失败: {e}")
         print("持仓明细数据插入成功")
